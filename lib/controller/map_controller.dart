@@ -16,7 +16,6 @@ class MapController extends GetxController {
   final searchResults = <Marker>{}.obs;
   final isLocationLoading = true.obs;
 
-
   final LatLng initialLocation = LatLng(23.8759, 90.3984);
 
   @override
@@ -27,8 +26,9 @@ class MapController extends GetxController {
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
-    mapController.animateCamera(CameraUpdate.newLatLngZoom(initialLocation, 15));
-
+    mapController.animateCamera(
+      CameraUpdate.newLatLngZoom(initialLocation, 15),
+    );
 
     markers.add(
       Marker(
@@ -84,9 +84,12 @@ class MapController extends GetxController {
           position: currentPosition!,
           infoWindow: InfoWindow(
             title: "My current location",
-            snippet: "${currentPosition!.latitude}, ${currentPosition!.longitude}",
+            snippet:
+                "${currentPosition!.latitude}, ${currentPosition!.longitude}",
           ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
         ),
       };
 
@@ -107,14 +110,18 @@ class MapController extends GetxController {
     try {
       List<Location> locations = await locationFromAddress(query);
       if (locations.isNotEmpty) {
-        LatLng searchPosition = LatLng(locations.first.latitude, locations.first.longitude);
+        LatLng searchPosition = LatLng(
+          locations.first.latitude,
+          locations.first.longitude,
+        );
         searchResults.value = {
           Marker(
             markerId: MarkerId("search_location"),
             position: searchPosition,
             infoWindow: InfoWindow(
               title: query,
-              snippet: "${searchPosition.latitude}, ${searchPosition.longitude}",
+              snippet:
+                  "${searchPosition.latitude}, ${searchPosition.longitude}",
             ),
           ),
         };
@@ -127,22 +134,31 @@ class MapController extends GetxController {
 
   Future<void> onMapTapped(LatLng tappedPosition) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(tappedPosition.latitude, tappedPosition.longitude);
-      String locationName = placemarks.isNotEmpty ? placemarks.first.name ?? 'Unknown Location' : 'Unknown Location';
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        tappedPosition.latitude,
+        tappedPosition.longitude,
+      );
+      String locationName =
+          placemarks.isNotEmpty
+              ? placemarks.first.name ?? 'Unknown Location'
+              : 'Unknown Location';
 
       markers.clear();
-      markers.add(Marker(
-        markerId: MarkerId(tappedPosition.toString()),
-        position: tappedPosition,
-        infoWindow: InfoWindow(
-          title: locationName,
-          snippet: "Latitude: ${tappedPosition.latitude}, Longitude: ${tappedPosition.longitude}",
+      markers.add(
+        Marker(
+          markerId: MarkerId(tappedPosition.toString()),
+          position: tappedPosition,
+          infoWindow: InfoWindow(
+            title: locationName,
+            snippet:
+                "Latitude: ${tappedPosition.latitude}, Longitude: ${tappedPosition.longitude}",
+          ),
         ),
-      ));
+      );
 
       mapController.animateCamera(CameraUpdate.newLatLng(tappedPosition));
     } catch (e) {
-      print("Error getting tapped location: $e");
+      print("Error tapped location: $e");
     }
   }
 
